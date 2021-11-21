@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://unpkg.com/theworld-client@1.0.5/dist/index.js"></script>
+    <title>Document</title>
+    <style>
+        #text {
+            text-align: center;
+        }
+        body {
+             background:none transparent;
+        }
+        body, html {
+            margin: 0;
+            height: 100%;
+        }
+        #container {
+            height: 100%;
+            align-items: center;
+            justify-content: center;
+            display: flex;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <h1 id="text"></h1>
+    </div>
+    <script>
+        const client = new TheWorld.Client();
+
+        (async () => {
+            await client.connect();
+            
+            const urlSearchParams = new URLSearchParams(window.location.search);
+            const params = Object.fromEntries(urlSearchParams.entries());
+
+            const textElement = document.getElementById('text');
+            textElement.innerText = params.text;
+            textElement.style.fontSize = params.fontSize || '40px';
+            textElement.style.fontFamily = params.fontFamily || 'Arial';
+            textElement.style.color = params.color || 'black';
+        })();
+    </script>
+</body>
+</html>

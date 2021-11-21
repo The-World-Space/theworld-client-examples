@@ -1,0 +1,5 @@
+node_modules
+dist/index.html
+dist/index.js
+dist/index.js.LICENSE.txt
+package-lock.json

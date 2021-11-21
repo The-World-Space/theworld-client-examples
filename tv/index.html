@@ -1,0 +1,122 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TV</title>
+    <script src="https://www.youtube.com/iframe_api"></script>
+    <script src="https://unpkg.com/theworld-client@1.0.5/dist/index.js"></script>
+    <style>
+        body {
+            margin: 0;
+            background-color: white;
+            color: black;
+            position: relative;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        #setVideo {
+            position: absolute;
+            bottom: 0;
+            width: 100vw;
+        }
+
+        #text {
+            box-sizing: border-box;
+            padding: 20px;
+            border-style: solid;
+            border-width: 1px 0;
+            border-color: black;
+            height: 50px;
+            width: 100%;
+            outline: none;
+        }
+
+        #video {
+            height: calc(100vh - 50px);
+            background-color: black;
+        }
+
+        #container {
+            display: flex;
+            height: 100vh;
+            width: 100vw;
+            justify-content: center;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+    <div id="video">
+        <div id="ytVideo"></div>
+    </div>
+    <div id="setVideo">
+        <input type="text" id="text">
+    </div>
+    <script>
+        const videoElement = document.getElementById("video");
+        const textInput = document.getElementById("text");
+
+        const client = new TheWorld.Client();
+
+        window.YT.ready(async function() {
+            await client.connect();
+
+            client.addFieldPort('video');
+
+            const videoField = await client.getField('video', undefined);
+            videoField.on('set', video => {
+                textInput.value = 'https://www.youtube.com/watch?v=' + video.id;
+                renderVideo();
+            });
+
+            if(videoField)
+                textInput.value = 'https://www.youtube.com/watch?v=' + videoField.value.id;
+
+            function renderVideo() {
+                videoElement.innerHTML = `<div id="ytVideo"></div>`;
+                if(!videoField.value) return;
+
+                function onReady() {
+                    const startSec = (new Date().getTime() - video.timestamp)/1000;
+                    player.seekTo(startSec, true);
+                    player.playVideo();
+                }
+
+                const video = videoField.value;
+
+                const boundingClientRect = videoElement.getBoundingClientRect();
+                const player = new YT.Player("ytVideo", {
+                    height: boundingClientRect.height,
+                    width: boundingClientRect.width,
+                    videoId: video.id,
+                    playerVars: {
+                        start: (new Date().getTime() - video.timestamp)/1000,
+                        autoplay: 1
+                    },
+                    events: {
+                        onReady
+                    }
+                });
+            }
+
+            textInput.addEventListener("keydown", e => {
+                if(e.key === "Enter") {
+                    const matched = textInput.value.match(/(?:https?:\/{2})?(?:w{3}\.)?youtu(?:be)?\.(?:com|be)(?:\/watch\?v=|\/)([^\s&]+)/);
+                    if(!matched) return;
+                    const videoId = matched[1];
+                    const video = {
+                        id: videoId,
+                        timestamp: (new Date()).getTime()
+                    };
+                    videoField.set(video);
+                }
+            });
+
+            renderVideo();
+        });
+    </script>
+</body>
+</html>
