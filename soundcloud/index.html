@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Soundcloud</title>
+    <script src="https://w.soundcloud.com/player/api.js"></script>
+    <script src="https://unpkg.com/theworld-client@1.0.5/dist/index.js"></script>
+    <style>
+        body {
+            margin: 0;
+            background-color: white;
+            color: black;
+            position: relative;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        #setVideo {
+            position: absolute;
+            bottom: 0;
+            width: 100vw;
+        }
+
+        #text {
+            box-sizing: border-box;
+            padding: 20px;
+            border-style: solid;
+            border-width: 1px 0;
+            border-color: black;
+            height: 50px;
+            width: 100%;
+            outline: none;
+        }
+
+        #audio {
+            height: calc(100vh - 50px);
+            background-color: white;
+        }
+
+        #container {
+            display: flex;
+            height: 100vh;
+            width: 100vw;
+            justify-content: center;
+            align-items: center;
+        }
+
+        iframe {
+            border: 0;
+        }
+    </style>
+</head>
+<body>
+    <div id="audio">
+        <iframe allow="autoplay" id="iframe" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/"></iframe></div>
+    <div id="setAudio">
+        <input type="text" id="text">
+    </div>
+    <script>
+        function getUrl(userId, musicId) {
+            return 'https://soundcloud.com/' + userId + '/' + musicId;
+        }
+
+        function anaylizeUrl(url) {
+            const matched = url.match(/^(?:https?:\/\/)?(?:www.)?(?:m\.)?soundcloud\.com\/([\w\-\.]+)(?:\/)+([\w\-\.]+)/);
+            if(!matched) return;
+            return {
+                userId: matched[1],
+                musicId: matched[2]
+            };
+        }
+
+        const iframeElement = document.getElementById('iframe');
+        const textInput = document.getElementById('text');
+
+        const widget = SC.Widget(iframeElement);
+
+        const client = new TheWorld.Client();
+
+        async function main() {
+            iframeElement.width = innerWidth;
+            iframeElement.height = innerHeight - 50;
+
+            let currentUrl = undefined;
+            let mySeek = undefined;
+
+            await client.connect();
+
+            client.addFieldPort('audio');
+
+            const audioField = await client.getField('audio', undefined);
+            audioField.on('set', value => {
+                textInput.value = getUrl(value.userId, value.musicId);
+                renderAudio();
+            });
+            
+            if(audioField.value)
+                textInput.value = getUrl(audioField.value.userId, audioField.value.musicId);
+
+            function play() {
+                if(!audioField.value) return;
+                const audio = audioField.value;
+
+                const startMs = (new Date().getTime() - audio.timestamp);
+                widget.seekTo(startMs);
+                widget.play();
+            }
+
+            function onSeek(info) {
+                console.log("SIBAL");
+                if(mySeek) {
+                    mySeek = false;
+                    return;
+                }
+
+                const currentMs = info.currentPosition;
+                const analyzed = anaylizeUrl(currentUrl);
+
+                const audio = {
+                    ...analyzed,
+                    timestamp: (new Date()).getTime() - currentMs
+                };
+                audioField.set(audio);
+            }
+            
+            function renderAudio() {
+                if(!textInput.value) return;
+
+                mySeek = true;
+                if(currentUrl === textInput.value) {
+                    play();
+                } else {
+                    currentUrl = textInput.value;
+                    widget.load(currentUrl, {
+                        callback: play
+                    });
+                }
+            }
+
+            widget.bind(SC.Widget.Events.SEEK, onSeek);
+
+            
+            textInput.addEventListener("keydown", e => {
+                if(e.key === "Enter") {
+                    const analyzed = anaylizeUrl(textInput.value);
+                    if(!analyzed) return;
+                    const audio = {
+                        ...analyzed,
+                        timestamp: (new Date()).getTime()
+                    };
+                    audioField.set(audio);
+                }
+            });
+
+            renderAudio();
+        }
+
+        main();
+    </script>
+</body>
+</html>
