@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://unpkg.com/theworld-client@1.0.7/dist/index.js"></script>
+    <title>Document</title>
+</head>
+<body>
+    <h1>Field Tester</h1>
+    <h2>Value</h2>
+    <p id="value"></p>
+    <p>FROM</p>
+    <p id="userId"></p>
+    <script>
+        const valueElement = document.getElementById('value');
+        const userIdElement = document.getElementById('userId');
+
+        const client = new TheWorld.Client();
+        client.addFieldPort('field');
+
+        async function main() {
+            await client.connect();
+            const field = await client.getField('field', undefined);
+
+            if(field.value !== undefined) {
+                valueElement.innerText = JSON.stringify(field.value);
+            }
+
+            field.on('set', (value, userId) => {
+                valueElement.innerText = JSON.stringify(value);
+                userIdElement.innerText = userId;
+            });
+        }
+
+        main();
+    </script>
+</body>
+</html>

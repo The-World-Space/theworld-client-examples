@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://unpkg.com/theworld-client@1.0.7/dist/index.js"></script>
+    <title>Document</title>
+</head>
+<body>
+    <h1>Broadcaster tester</h1>
+    <input type="text" id="eventNameInput" placeholder="event name">
+    <input type="button" onclick="main()">
+    <div id="list">
+    
+    </div>
+    <script>
+        const eventNameInputElement = document.getElementById('eventNameInput');
+        const listElement = document.getElementById('list');
+
+        const client = new TheWorld.Client();
+        client.addBroadcasterPort('broadcaster');
+
+        async function main() {
+            await client.connect();
+            const broadcaster = await client.getBroadcaster('broadcaster', undefined);
+            
+            broadcaster.on(eventNameInputElement.value, (userId, value) => {
+                const valueElement = document.createElement('p');
+                const userIdElement = document.createElement('p');
+                valueElement.innerText = JSON.stringify(value);
+                userIdElement.innerText = userId;
+
+                const listItemElement = document.createElement('div');
+                listItemElement.appendChild(valueElement);
+                listItemElement.appendChild(userIdElement);
+                listItemElement.appendChild(document.createElement('hr'));
+
+                listElement.appendChild(listItemElement);
+            });
+        }
+    </script>
+</body>
+</html>

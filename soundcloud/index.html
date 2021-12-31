@@ -77,6 +77,7 @@
         const widget = SC.Widget(iframeElement);
 
         const client = new TheWorld.Client();
+            client.addFieldPort('video');
 
         async function main() {
             iframeElement.width = innerWidth;
@@ -86,8 +87,6 @@
             let mySeek = undefined;
 
             await client.connect();
-
-            client.addFieldPort('audio');
 
             const audioField = await client.getField('audio', undefined);
             audioField.on('set', value => {
@@ -108,7 +107,6 @@
             }
 
             function onSeek(info) {
-                console.log("SIBAL");
                 if(mySeek) {
                     mySeek = false;
                     return;

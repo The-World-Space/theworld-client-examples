@@ -60,11 +60,11 @@
         const textInput = document.getElementById("text");
 
         const client = new TheWorld.Client();
+        client.addFieldPort('video');
+        client.addBroadcasterPort('event');
 
         window.YT.ready(async function() {
             await client.connect();
-
-            client.addFieldPort('video');
 
             const videoField = await client.getField('video', undefined);
             videoField.on('set', video => {
@@ -72,7 +72,9 @@
                 renderVideo();
             });
 
-            if(videoField)
+            const eventBroadcaster = await client.getBroadcaster('event');
+
+            if(videoField.value)
                 textInput.value = 'https://www.youtube.com/watch?v=' + videoField.value.id;
 
             function renderVideo() {
@@ -85,6 +87,10 @@
                     player.playVideo();
                 }
 
+                function onStateChange(state) {
+                    eventBroadcaster.emit('state', state.data);
+                }
+
                 const video = videoField.value;
 
                 const boundingClientRect = videoElement.getBoundingClientRect();
@@ -94,10 +100,15 @@
                     videoId: video.id,
                     playerVars: {
                         start: (new Date().getTime() - video.timestamp)/1000,
-                        autoplay: 1
+                        autoplay: 1,
+                        controls: 0, 
+                        rel: 0,
+                        fs: 0,
+                        disableKb: 1
                     },
                     events: {
-                        onReady
+                        onReady,
+                        onStateChange
                     }
                 });
             }
