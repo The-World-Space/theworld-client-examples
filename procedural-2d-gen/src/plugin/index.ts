@@ -44,6 +44,7 @@ class Plugin extends BasePlugin {
     public override onPlayerLeave(userId: string): void {
         try {
             this._players.delete(userId);
+            this._worldGenerator?.removePlayer(userId);
         } catch(e) {
             this.broadcastMessage("error", e);
         }
