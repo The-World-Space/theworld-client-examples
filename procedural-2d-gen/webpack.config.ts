@@ -1,10 +1,13 @@
 import path from "path";
 import HtmlWebpackPlugin from "html-webpack-plugin";
 import ESLintPlugin from "eslint-webpack-plugin";
+import inlineFileTransformer from "ts-transformer-inline-file/transformer";
+import { Program } from "typescript";
+import webpack from "webpack";
 //import { BundleAnalyzerPlugin } from "webpack-bundle-analyzer";
 
-export default {
-    entry: "./src/index.ts",
+const config: webpack.Configuration & { devServer: any } = {
+    entry: "./src/iframe/index.ts",
     output: {
         path: path.join(__dirname, "/dist"),
         filename: "bundle.js",
@@ -15,9 +18,18 @@ export default {
     },
     module: {
         rules: [{
-                test: /\.tsx?$/,
+                test: /\.(ts|tsx|js|jsx)$/,
                 use: [{
-                    loader: "ts-loader"
+                    loader: "ts-loader",
+                    options: {
+                        getCustomTransformers: (program: Program) => {
+                            return {
+                                before: [
+                                    inlineFileTransformer(program)
+                                ]
+                            };
+                        }
+                    }
                 }]
             },
             {
@@ -49,10 +61,10 @@ export default {
     },
     plugins: [
         new HtmlWebpackPlugin({
-            template: "./src/index.html"
+            template: "./src/iframe/index.html"
         }),
         new ESLintPlugin({
-            extensions: ["ts", "tsx"]
+            extensions: ["ts", "tsx", "js", "jsx"]
         }),
         //new BundleAnalyzerPlugin()
     ],
@@ -63,3 +75,5 @@ export default {
     },
     mode: "development"
 };
+
+export default config;

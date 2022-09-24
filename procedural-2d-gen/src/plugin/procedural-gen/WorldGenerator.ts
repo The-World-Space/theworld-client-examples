@@ -20,10 +20,12 @@ export class WorldGenerator {
     private readonly _playerViewDistance: number;
 
     private readonly _loadCirclePoints: Immutable<Vector2>[];
-    private readonly _playerChunkPositions = new Map<number, Vector2>();
-    private readonly _userChunks = new Map<number, UserChunkData>();
+    private readonly _playerChunkPositions = new Map<string, Vector2>();
+    private readonly _userChunks = new Map<string, UserChunkData>();
     private readonly _loadedChunks = new Map<`${number}_${number}`, number>();
     private readonly _unloadChunkQueueMaxValue: number;
+
+    private _disposed = false;
 
     public constructor(
         dispatcher: CoroutineDispatcher,
@@ -113,7 +115,7 @@ export class WorldGenerator {
         return result;
     }
 
-    private updateChunkEnqueue(playerId: number, chunkIndex?: Immutable<Vector2>): void {
+    private updateChunkEnqueue(playerId: string, chunkIndex?: Immutable<Vector2>): void {
         const loadCirclePoints = this._loadCirclePoints!;
 
         let userChunkData = this._userChunks.get(playerId);
@@ -153,7 +155,7 @@ export class WorldGenerator {
 
     private readonly _tempVector2 = new Vector2();
 
-    private *processUpdateChunk(playerId: number): CoroutineIterator {
+    private *processUpdateChunk(playerId: string): CoroutineIterator {
         const userChunkData = this._userChunks.get(playerId);
         if (userChunkData === undefined) return;
 
@@ -163,7 +165,7 @@ export class WorldGenerator {
 
         let startTime = Date.now();
 
-        while (0 < loadChunkQueue.size || 0 < unloadChunkQueue.size) {
+        while ((0 < loadChunkQueue.size || 0 < unloadChunkQueue.size) && !this._disposed) {
             if (this._unloadChunkQueueMaxValue < unloadChunkQueue.size || loadChunkQueue.size <= 0) {
                 //unloadChunk
                 const unloadChunk = unloadChunkQueue.keys().next().value as `${number}_${number}`;
@@ -176,7 +178,7 @@ export class WorldGenerator {
                         this._loadedChunks.delete(unloadChunk);
 
                         const parsedUnloadChunk = unloadChunk.split("_").map(Number) as [number, number];
-                        this._chunkLoader!.unloadChunk(this._tempVector2.set(parsedUnloadChunk[0], parsedUnloadChunk[1]));
+                        this._chunkLoader.unloadChunk(this._tempVector2.set(parsedUnloadChunk[0], parsedUnloadChunk[1]));
                     } else {
                         this._loadedChunks.set(unloadChunk, loadedChunkRefs - 1);
                     }
@@ -192,7 +194,7 @@ export class WorldGenerator {
                     this._loadedChunks.set(loadChunk, 1);
 
                     const parsedLoadChunk = loadChunk.split("_").map(Number) as [number, number];
-                    this._chunkLoader!.loadChunk(this._tempVector2.set(parsedLoadChunk[0], parsedLoadChunk[1]));
+                    this._chunkLoader.loadChunk(this._tempVector2.set(parsedLoadChunk[0], parsedLoadChunk[1]));
                 } else {
                     this._loadedChunks.set(loadChunk, loadedChunkRefs + 1);
                 }
@@ -206,10 +208,10 @@ export class WorldGenerator {
         }
     }
     
-    private readonly _taskQueue = new Set<number>();
-    private readonly _runningTasks = new Set<number>();
+    private readonly _taskQueue = new Set<string>();
+    private readonly _runningTasks = new Set<string>();
 
-    private lazyUpdateChunk(playerId: number, chunkIndex?: Immutable<Vector2>): void {
+    private lazyUpdateChunk(playerId: string, chunkIndex?: Immutable<Vector2>): void {
         this.updateChunkEnqueue(playerId, chunkIndex);
 
         if (this._runningTasks.has(playerId)) return;
@@ -229,8 +231,8 @@ export class WorldGenerator {
 
     private readonly _tempVector1 = new Vector2();
 
-    public updatePlayerPosition(playerId: number, position: Immutable<Vector2>): void {
-        const chunkLoader = this._chunkLoader!;
+    public updatePlayerPosition(playerId: string, position: Immutable<Vector2>): void {
+        const chunkLoader = this._chunkLoader;
         const playerChunkPosition = chunkLoader.getChunkIndexFromPosition(position, this._tempVector1);
         const playerOldChunkPosition = this._playerChunkPositions.get(playerId);
         if (playerOldChunkPosition?.equals(playerChunkPosition)) return;
@@ -244,7 +246,7 @@ export class WorldGenerator {
         }   
     }
 
-    public removePlayer(playerId: number): void {
+    public removePlayer(playerId: string): void {
         const playerPosition = this._playerChunkPositions.get(playerId);
         if (playerPosition) {
             this.lazyUpdateChunk(playerId, undefined);
@@ -252,7 +254,16 @@ export class WorldGenerator {
         }
     }
 
+    public dispose(): void {
+        const loadedChunks = this._loadedChunks;
+        for (const chunkKey of loadedChunks.keys()) {
+            const parsedChunkKey = chunkKey.split("_").map(Number) as [number, number];
+            this._chunkLoader.unloadChunk(this._tempVector1.set(parsedChunkKey[0], parsedChunkKey[1]));
+        }
+        this._disposed = true;
+    }
+
     public get generator(): ProceduralMapGenerator {
-        return this._chunkLoader!.generator;
+        return this._chunkLoader.generator;
     }
 }

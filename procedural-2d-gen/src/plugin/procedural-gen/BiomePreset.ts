@@ -19,7 +19,7 @@ export abstract class BiomePreset {
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export const Desert = new class Desert extends BiomePreset {
     public readonly tiles = [
-        { i: 0, a: 15 }
+        { i: 70, a: 15 }
     ];
     public readonly minHeight = 0;
     public readonly minMoisture = 0;
@@ -29,7 +29,7 @@ export const Desert = new class Desert extends BiomePreset {
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export const Grassland = new class Grassland extends BiomePreset {
     public readonly tiles = [
-        { i: 0, a: 22 }
+        { i: 70, a: 22 }
     ];
     public readonly minHeight = 0.1;
     public readonly minMoisture = 0.2;
@@ -39,7 +39,7 @@ export const Grassland = new class Grassland extends BiomePreset {
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export const Mountains = new class Mountains extends BiomePreset {
     public readonly tiles = [
-        { i: 0, a: 54 }
+        { i: 70, a: 54 }
     ];
     public readonly minHeight = 0.7;
     public readonly minMoisture = 0;

@@ -20,7 +20,7 @@ export class BiomeTempData {
 }
 
 export class ProceduralMapGenerator {
-    public tilemap: ITilemapRenderer;
+    public readonly tilemap: ITilemapRenderer;
 
     public biomes: BiomePreset[] = [
         Desert,
