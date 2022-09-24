@@ -7,6 +7,12 @@ async function main(): Promise<void> {
     const client = new Client();
     client.addPluginPort("plugin", $INLINE_FILE("./plugin.js"), "");
     await client.connect();
+
+    const plugin = await client.getPlugin("plugin");
+
+    plugin.on("error", (error: Error) => {
+        console.error("plugin error", error);
+    });
 }
 
 main();
