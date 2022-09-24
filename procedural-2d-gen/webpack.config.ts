@@ -1,5 +1,7 @@
 import path from "path";
 import HtmlWebpackPlugin from "html-webpack-plugin";
+import HtmlInlineScriptPlugin from "html-inline-script-webpack-plugin";
+import HTMLInlineCSSWebpackPlugin from "html-inline-css-webpack-plugin";
 import ESLintPlugin from "eslint-webpack-plugin";
 import inlineFileTransformer from "ts-transformer-inline-file/transformer";
 import { Program } from "typescript";
@@ -19,37 +21,49 @@ const config: webpack.Configuration = {
     },
     module: {
         rules: [{
-                test: /\.(ts|tsx|js|jsx)$/,
-                use: [{
-                    loader: "ts-loader",
-                    options: {
-                        getCustomTransformers: (program: Program) => {
-                            return {
-                                before: [
-                                    inlineFileTransformer(program)
-                                ]
-                            };
-                        }
-                    }
-                }]
-            },
-            {
-                test: /\.(png|jpg|gif|hdr)$/,
-                type: "asset"
-            },
-            {
-                test: /\.(mp3|ogg|wav)$/,
-                loader: "file-loader",
+            test: /\.(ts|tsx|js|jsx)$/,
+            use: [{
+                loader: "ts-loader",
                 options: {
-                    name: "asset/audio/[name].[ext]?[hash]"
+                    getCustomTransformers: (program: Program) => {
+                        return {
+                            before: [
+                                inlineFileTransformer(program)
+                            ]
+                        };
+                    }
                 }
-            },
-            {
-                test: /\.html$/,
-                use: [{
-                    loader: "html-loader"
-                }]
+            }]
+        },
+        {
+            test: /\.(png|jpg|gif|hdr)$/,
+            type: "asset"
+        },
+        {
+            test: /\.(mp3|ogg|wav)$/,
+            loader: "file-loader",
+            options: {
+                name: "asset/audio/[name].[ext]?[hash]"
             }
+        },
+        {
+            test: /\.html$/,
+            use: [
+                { loader: "html-loader" }
+            ]
+        },
+        {
+            test: /\.css$/,
+            use: [
+                {
+                    loader: "style-loader",
+                    options: {
+                        injectType: "styleTag"
+                    }
+                },
+                "css-loader"
+            ]
+        }
         ]
     },
     resolve: {
@@ -64,6 +78,8 @@ const config: webpack.Configuration = {
         new HtmlWebpackPlugin({
             template: "./src/iframe/index.html"
         }),
+        new HtmlInlineScriptPlugin(),
+        new HTMLInlineCSSWebpackPlugin(),
         new ESLintPlugin({
             extensions: ["ts", "tsx", "js", "jsx"]
         }),

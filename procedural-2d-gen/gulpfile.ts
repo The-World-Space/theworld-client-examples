@@ -42,15 +42,17 @@ gulp.task("watch-iframe", gulp.series("iframe", function watch(): void {
 }));
 
 gulp.task("webserver", (): void => {
-    gulp.src("src/iframe")
+    gulp.src("./dist")
         .pipe(webserver({
             livereload: true,
             directoryListing: true,
             open: true,
-            path: "dist"
+            port: 20310,
+            path: "dist",
+            fallback: "index.html"
         }));
 });
 
 gulp.task("watch", gulp.parallel("watch-plugin", "watch-iframe", "webserver"));
 
-gulp.task("build", gulp.parallel("plugin", "iframe"));
+gulp.task("build", gulp.series("plugin", "iframe"));

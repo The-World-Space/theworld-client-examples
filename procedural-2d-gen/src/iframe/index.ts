@@ -1,3 +1,5 @@
+import "./index.css";
+
 import { Client } from "theworld-client";
 import { $INLINE_FILE } from "ts-transformer-inline-file";
 
