@@ -21,7 +21,8 @@ gulp.task("plugin", (): NodeJS.ReadWriteStream => {
             input: "./src/plugin/index.js",
             output: {
                 format: "iife"
-            }
+            },
+            context: "this"
         }))
         .pipe(rename("plugin.js"))
         .pipe(gulp.dest("src/iframe"));
