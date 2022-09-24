@@ -6,12 +6,13 @@ import { Program } from "typescript";
 import webpack from "webpack";
 //import { BundleAnalyzerPlugin } from "webpack-bundle-analyzer";
 
-const config: webpack.Configuration & { devServer: any } = {
+const config: webpack.Configuration = {
     entry: "./src/iframe/index.ts",
     output: {
         path: path.join(__dirname, "/dist"),
         filename: "bundle.js",
-        assetModuleFilename: "static/[name][ext]"
+        assetModuleFilename: "static/[name][ext]",
+        publicPath: "/"
     },
     optimization: {
         minimize: true
@@ -68,11 +69,11 @@ const config: webpack.Configuration & { devServer: any } = {
         }),
         //new BundleAnalyzerPlugin()
     ],
-    devServer: {
-        host: "0.0.0.0",
-        allowedHosts: "all",
-        port: 20310
-    },
+    // devServer: {
+    //     host: "0.0.0.0",
+    //     allowedHosts: "all",
+    //     port: 20310
+    // },
     mode: "development"
 };
 

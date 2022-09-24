@@ -6,6 +6,7 @@ import webpack from "webpack";
 import webpackConfig from "./webpack.config";
 import webpackStream from "webpack-stream";
 const rollup = require("gulp-rollup");
+const webserver = require("gulp-webserver");
 
 const pluginTsProject = ts.createProject("tsconfig.json", {
     target: "es6",
@@ -26,14 +27,30 @@ gulp.task("plugin", (): NodeJS.ReadWriteStream => {
         .pipe(gulp.dest("src/iframe"));
 });
 
+gulp.task("watch-plugin", gulp.series("plugin", function watch(): void {
+    gulp.watch("src/plugin/**/*.ts", gulp.series("plugin"));
+}));
+
 gulp.task("iframe", (): NodeJS.ReadWriteStream => {
     return gulp.src("src/iframe/index.ts")
         .pipe(webpackStream(webpackConfig, webpack as any))
         .pipe(gulp.dest("dist/"));
 });
 
-gulp.task("watchPlugin", gulp.series("plugin", function watch(): void {
-    gulp.watch("src/plugin/**/*.ts", gulp.series("plugin"));
+gulp.task("watch-iframe", gulp.series("iframe", function watch(): void {
+    gulp.watch("src/iframe/**/*.ts", gulp.series("iframe"));
 }));
 
-gulp.task("watch", gulp.parallel("watchPlugin", "iframe"));
+gulp.task("webserver", (): void => {
+    gulp.src("src/iframe")
+        .pipe(webserver({
+            livereload: true,
+            directoryListing: true,
+            open: true,
+            path: "dist"
+        }));
+});
+
+gulp.task("watch", gulp.parallel("watch-plugin", "watch-iframe", "webserver"));
+
+gulp.task("build", gulp.parallel("plugin", "iframe"));
