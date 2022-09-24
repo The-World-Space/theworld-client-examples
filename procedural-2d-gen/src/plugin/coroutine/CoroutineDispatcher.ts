@@ -6,7 +6,7 @@ import { Time } from "./Time";
 export class CoroutineDispatcher {
     private readonly _time: Time;
     private readonly _coroutineProcessor: CoroutineProcessor;
-    private _setIntervalId: number;
+    private _setIntervalId: ReturnType<typeof setInterval>|null;
 
     public constructor(updateInterval = 10) {
         const time = this._time = new Time();
@@ -14,7 +14,7 @@ export class CoroutineDispatcher {
 
         time.start();
 
-        this._setIntervalId = window.setInterval(() => {
+        this._setIntervalId = setInterval(() => {
             this.update();
         }, updateInterval);
     }
@@ -33,9 +33,9 @@ export class CoroutineDispatcher {
     }
 
     public dispose(): void {
-        if (this._setIntervalId !== -1) {
-            window.clearInterval(this._setIntervalId);
-            this._setIntervalId = -1;
+        if (this._setIntervalId !== null) {
+            clearInterval(this._setIntervalId);
+            this._setIntervalId = null;
         }
     }
 }
