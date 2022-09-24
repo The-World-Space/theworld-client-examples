@@ -9,7 +9,7 @@ const rollup = require("gulp-rollup");
 const webserver = require("gulp-webserver");
 
 const pluginTsProject = ts.createProject("tsconfig.json", {
-    target: "es6",
+    target: "es5",
     declaration: false
 });
 
