@@ -5,13 +5,11 @@ import { CoroutineProcessor } from "./CoroutineProcessor";
 import { Time } from "./Time";
 
 export class CoroutineDispatcher {
-    private readonly _logger: Logger;
     private readonly _time: Time;
     private readonly _coroutineProcessor: CoroutineProcessor;
     private _setIntervalId: ReturnType<typeof setInterval>|null;
 
-    public constructor(logger: Logger, updateInterval = 10) {
-        this._logger = logger;
+    public constructor(updateInterval = 10) {
         const time = this._time = new Time();
         this._coroutineProcessor = new CoroutineProcessor(time);
 
@@ -21,7 +19,7 @@ export class CoroutineDispatcher {
             try {
                 this.update();
             } catch(e) {
-                this._logger.error(e);
+                Logger.error(e);
             }
         }, updateInterval);
     }

@@ -10,16 +10,16 @@ class Plugin extends BasePlugin {
     private _coroutineDispatcher: CoroutineDispatcher|null = null;
     private _worldGenerator: WorldGenerator|null = null;
 
-    private readonly _logger = new Logger(this);
     private readonly _players = new Set<string>();
     private readonly _tempVector = new Vector2();
 
     public override onLoad(): void {
+        Logger.init(this);
         try {
-            const dispatcher = this._coroutineDispatcher = new CoroutineDispatcher(this._logger);
+            const dispatcher = this._coroutineDispatcher = new CoroutineDispatcher();
             this._worldGenerator = new WorldGenerator(dispatcher, this, this._chunkSize, this._playerViewDistance);
         } catch(e) {
-            this._logger.error(e);
+            Logger.error(e);
         }
     }
 
@@ -30,7 +30,7 @@ class Plugin extends BasePlugin {
             this._worldGenerator!.dispose();
             this._worldGenerator = null;
         } catch(e) {
-            this._logger.error(e);
+            Logger.error(e);
         }
     }
 
@@ -39,7 +39,7 @@ class Plugin extends BasePlugin {
             this._players.add(userId);
             this._worldGenerator?.updatePlayerPosition(userId, this._tempVector.set(0, 0));
         } catch(e) {
-            this._logger.error(e);
+            Logger.error(e);
         }
     }
 
@@ -48,7 +48,7 @@ class Plugin extends BasePlugin {
             this._players.delete(userId);
             this._worldGenerator?.removePlayer(userId);
         } catch(e) {
-            this._logger.error(e);
+            Logger.error(e);
         }
     }
     
@@ -56,7 +56,7 @@ class Plugin extends BasePlugin {
         try {
             this._worldGenerator?.updatePlayerPosition(playerId, this._tempVector.set(x, y));
         } catch(e) {
-            this._logger.error(e);
+            Logger.error(e);
         }
     }
 }
