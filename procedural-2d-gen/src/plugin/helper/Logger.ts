@@ -6,10 +6,10 @@ export class Logger {
     }
 
     public static log(message: any): void {
-        Logger._plugin.sendMessage("log", message);
+        Logger._plugin.broadcastMessage("log", message);
     }
 
     public static error(message: any): void {
-        Logger._plugin.sendMessage("error", message);
+        Logger._plugin.broadcastMessage("error", message);
     }
 }
