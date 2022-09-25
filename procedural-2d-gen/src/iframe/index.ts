@@ -10,6 +10,10 @@ async function main(): Promise<void> {
 
     const plugin = await client.getPlugin("plugin");
 
+    plugin.on("log", (message: any) => {
+        console.log("plugin log", message);
+    });
+
     plugin.on("error", (error: Error) => {
         console.error("plugin error", error);
     });

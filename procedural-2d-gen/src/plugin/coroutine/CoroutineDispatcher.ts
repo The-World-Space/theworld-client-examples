@@ -1,21 +1,28 @@
+import { Logger } from "../helper/Logger";
 import { Coroutine } from "./Coroutine";
 import { CoroutineIterator } from "./CoroutineIterator";
 import { CoroutineProcessor } from "./CoroutineProcessor";
 import { Time } from "./Time";
 
 export class CoroutineDispatcher {
+    private readonly _logger: Logger;
     private readonly _time: Time;
     private readonly _coroutineProcessor: CoroutineProcessor;
     private _setIntervalId: ReturnType<typeof setInterval>|null;
 
-    public constructor(updateInterval = 10) {
+    public constructor(logger: Logger, updateInterval = 10) {
+        this._logger = logger;
         const time = this._time = new Time();
         this._coroutineProcessor = new CoroutineProcessor(time);
 
         time.start();
 
         this._setIntervalId = setInterval(() => {
-            this.update();
+            try {
+                this.update();
+            } catch(e) {
+                this._logger.error(e);
+            }
         }, updateInterval);
     }
 
