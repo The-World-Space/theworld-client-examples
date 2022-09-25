@@ -15,6 +15,8 @@ class Plugin extends BasePlugin {
 
     public override onLoad(): void {
         Logger.init(this);
+
+        Logger.log("onLoad");
         try {
             const dispatcher = this._coroutineDispatcher = new CoroutineDispatcher();
             this._worldGenerator = new WorldGenerator(dispatcher, this, this._chunkSize, this._playerViewDistance);
@@ -24,6 +26,7 @@ class Plugin extends BasePlugin {
     }
 
     public override onUnload(): void {
+        Logger.log("onUnload");
         try {
             this._coroutineDispatcher!.dispose();
             this._coroutineDispatcher = null;
@@ -35,6 +38,7 @@ class Plugin extends BasePlugin {
     }
 
     public override onPlayerJoin(userId: string): void {
+        Logger.log(`onPlayerJoin: ${userId}`);
         try {
             this._players.add(userId);
             this._worldGenerator?.updatePlayerPosition(userId, this._tempVector.set(0, 0));
@@ -44,6 +48,7 @@ class Plugin extends BasePlugin {
     }
 
     public override onPlayerLeave(userId: string): void {
+        Logger.log(`onPlayerLeave: ${userId}`);
         try {
             this._players.delete(userId);
             this._worldGenerator?.removePlayer(userId);
@@ -53,6 +58,7 @@ class Plugin extends BasePlugin {
     }
     
     public override onPlayerMove(playerId: string, x: number, y: number): void {
+        Logger.log(`onPlayerMove: ${playerId} ${x} ${y}`);
         try {
             this._worldGenerator?.updatePlayerPosition(playerId, this._tempVector.set(x, y));
         } catch(e) {

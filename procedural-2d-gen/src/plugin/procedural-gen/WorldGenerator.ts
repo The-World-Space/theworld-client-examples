@@ -2,6 +2,7 @@ import { Immutable } from "src/plugin/types/Immutable";
 
 import { CoroutineDispatcher } from "../coroutine/CoroutineDispatcher";
 import { CoroutineIterator } from "../coroutine/CoroutineIterator";
+import { Logger } from "../helper/Logger";
 import { Vector2 } from "../math/Vector2";
 import { ChunkLoader } from "./ChunkLoader";
 import { ITilemapRenderer } from "./ITilemapRenderer";
@@ -116,6 +117,7 @@ export class WorldGenerator {
     }
 
     private updateChunkEnqueue(playerId: string, chunkIndex?: Immutable<Vector2>): void {
+        Logger.log(`updateChunkEnqueue ${playerId} ${chunkIndex}`);
         const loadCirclePoints = this._loadCirclePoints!;
 
         let userChunkData = this._userChunks.get(playerId);
