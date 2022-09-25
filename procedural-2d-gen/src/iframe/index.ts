@@ -11,11 +11,11 @@ async function main(): Promise<void> {
     const plugin = await client.getPlugin("plugin");
 
     plugin.on("log", (message: any) => {
-        console.log("plugin log", message);
+        console.log("[procedural-2d-gen]", message);
     });
 
     plugin.on("error", (error: Error) => {
-        console.error("plugin error", error);
+        console.error("[procedural-2d-gen]", error);
     });
 }
 

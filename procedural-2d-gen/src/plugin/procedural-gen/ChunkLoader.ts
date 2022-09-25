@@ -63,10 +63,10 @@ export class ChunkLoader {
     }
 
     public unloadAllChunks(): void {
-        for (const chunkIndexString of this._loadedChunks) {
+        this._loadedChunks.forEach((chunkIndexString) => {
             const chunkIndex = chunkIndexString.split("_") as [string, string];
             this.destroyChunk(new Vector2(parseInt(chunkIndex[0]), parseInt(chunkIndex[1])));
-        }
+        });
         this._loadedChunks.clear();
     }
 

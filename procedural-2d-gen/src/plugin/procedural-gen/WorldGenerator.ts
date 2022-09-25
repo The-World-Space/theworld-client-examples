@@ -117,7 +117,6 @@ export class WorldGenerator {
     }
 
     private updateChunkEnqueue(playerId: string, chunkIndex?: Immutable<Vector2>): void {
-        Logger.log(`updateChunkEnqueue ${playerId} ${chunkIndex}`);
         const loadCirclePoints = this._loadCirclePoints!;
 
         let userChunkData = this._userChunks.get(playerId);
@@ -132,10 +131,10 @@ export class WorldGenerator {
         unloadChunkQueue.clear();
 
         const unloadChunkList: `${number}_${number}`[] = [];
-
-        for (const chunkKey of userChunkData.loadedChunks) {
+        
+        userChunkData.loadedChunks.forEach((chunkKey) => {
             unloadChunkList.push(chunkKey);
-        }
+        });
 
         for (let i = unloadChunkList.length - 1; 0 <= i; --i) {
             unloadChunkQueue.add(unloadChunkList[i]);
@@ -258,10 +257,10 @@ export class WorldGenerator {
 
     public dispose(): void {
         const loadedChunks = this._loadedChunks;
-        for (const chunkKey of loadedChunks.keys()) {
+        loadedChunks.forEach((_, chunkKey) => {
             const parsedChunkKey = chunkKey.split("_").map(Number) as [number, number];
             this._chunkLoader.unloadChunk(this._tempVector1.set(parsedChunkKey[0], parsedChunkKey[1]));
-        }
+        });
         this._disposed = true;
     }
 
