@@ -29,7 +29,7 @@ gulp.task("plugin", (): NodeJS.ReadWriteStream => {
 });
 
 gulp.task("watch-plugin", gulp.series("plugin", function watch(): void {
-    gulp.watch("src/plugin/**/*.ts", gulp.series("plugin"));
+    gulp.watch("src/plugin/**/*", gulp.series("plugin"));
 }));
 
 gulp.task("iframe", (): NodeJS.ReadWriteStream => {
@@ -39,7 +39,7 @@ gulp.task("iframe", (): NodeJS.ReadWriteStream => {
 });
 
 gulp.task("watch-iframe", gulp.series("iframe", function watch(): void {
-    gulp.watch("src/iframe/**/*.ts", gulp.series("iframe"));
+    gulp.watch("src/iframe/**/*", gulp.series("iframe"));
 }));
 
 gulp.task("webserver", (): void => {
