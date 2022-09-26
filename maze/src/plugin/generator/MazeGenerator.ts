@@ -1,7 +1,7 @@
 import { Mulberry32 } from "../math/Mulberry32";
 import { Vector2 } from "../math/Vector2";
 import { Immutable } from "../types/Immutable";
-import { IWorld } from "./IWorld";
+import { LazyWorld } from "./LazyWorld";
 
 class GridCell {
     public x: number;
@@ -17,11 +17,11 @@ class GridCell {
 }
 
 export class MazeGenerator {
-    private readonly _world: IWorld;
+    private readonly _world: LazyWorld;
     private readonly _spawnedTiles: Immutable<Vector2>[] = [];
     private readonly _spawnedColliders: Immutable<Vector2>[] = [];
 
-    public constructor(world: IWorld) {
+    public constructor(world: LazyWorld) {
         this._world = world;
     }
 
@@ -60,7 +60,7 @@ export class MazeGenerator {
                 const block = blocks[x][y];
                 const xWorld = x + offset.x;
                 const yWorld = y + offset.y;
-                this._world.setTile(xWorld, yWorld, 40, block ? 1 : 0, false);
+                this._world.setTile(xWorld, yWorld, 40, block ? 1 : 0);
                 this._spawnedTiles.push(new Vector2(xWorld, yWorld));
                 if (block) {
                     this._world.setCollider(xWorld, yWorld, true);
@@ -74,7 +74,7 @@ export class MazeGenerator {
         const spawnedTiles = this._spawnedTiles;
         for (let i = 0; i < spawnedTiles.length; ++i) {
             const tile = spawnedTiles[i];
-            this._world.deleteTile(tile.x, tile.y, false);
+            this._world.deleteTile(tile.x, tile.y);
         }
         spawnedTiles.length = 0;
 
@@ -145,7 +145,7 @@ export class MazeGenerator {
             for (let y = 0; y < height; y++) {
                 blocks[2 * x + 1][2 * y + 1] = false;
                 blocks[2 * x + 2][2 * y + 1] = grid[x][y].walls[1];
-                blocks[2 * x + 1][2 * y + 2] = grid[x][y].walls[2];
+                blocks[2 * x + 1][2 * y + 2] = grid[x][y].walls[3];
                 blocks[2 * x + 2][2 * y + 2] = true;
             }
         }
