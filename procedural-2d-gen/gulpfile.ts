@@ -14,9 +14,15 @@ const pluginTsProject = ts.createProject("tsconfig.json", {
 });
 
 gulp.task("plugin", (): NodeJS.ReadWriteStream => {
-    return gulp.src("src/plugin/**/*.ts")
-        .pipe(pluginTsProject())
-        .pipe(terser({ compress: true }))
+    const stream = gulp.src("src/plugin/**/*.ts")
+        .pipe(pluginTsProject()
+            .on("error", (): void => {
+                stream.emit("end");
+            }))
+        .pipe(terser({ compress: true })
+            .on("error", (): void => {
+                stream.emit("end");
+            }))
         .pipe(rollup({
             input: "./src/plugin/index.js",
             output: {
@@ -26,6 +32,8 @@ gulp.task("plugin", (): NodeJS.ReadWriteStream => {
         }))
         .pipe(rename("plugin.js"))
         .pipe(gulp.dest("src/iframe"));
+
+    return stream;
 });
 
 gulp.task("watch-plugin", gulp.series("plugin", function watch(): void {
@@ -33,9 +41,14 @@ gulp.task("watch-plugin", gulp.series("plugin", function watch(): void {
 }));
 
 gulp.task("iframe", (): NodeJS.ReadWriteStream => {
-    return gulp.src("src/iframe/index.ts")
-        .pipe(webpackStream(webpackConfig, webpack as any))
+    const stream = gulp.src("src/iframe/index.ts")
+        .pipe(webpackStream(webpackConfig, webpack as any)
+            .on("error", (): void => {
+                stream.emit("end");
+            }))
         .pipe(gulp.dest("dist/"));
+    
+    return stream;
 });
 
 gulp.task("watch-iframe", gulp.series("iframe", function watch(): void {

@@ -25,6 +25,7 @@ const config: webpack.Configuration = {
             use: [{
                 loader: "ts-loader",
                 options: {
+                    configFile: "tsconfig.webpack.json",
                     getCustomTransformers: (program: Program) => {
                         return {
                             before: [
