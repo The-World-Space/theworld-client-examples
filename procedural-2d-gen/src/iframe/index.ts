@@ -52,11 +52,11 @@ async function main(): Promise<void> {
     seedInput.oninput = (event): void => {
         event.preventDefault();
         seedInputEventExecutor.execute(() => {
-            plugin.emit("set-seed", seedInput.value);
+            plugin.emit("set-seed", parseInt(seedInput.value));
         });
     };
-    plugin.on("seed", (seed: string) => {
-        seedInput.value = seed;
+    plugin.on("seed", (seed: number) => {
+        seedInput.value = seed.toString();
     });
     plugin.emit("request-seed");
 }
