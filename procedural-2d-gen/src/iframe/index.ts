@@ -29,7 +29,6 @@ async function main(): Promise<void> {
         });
     };
     plugin.on("chunk-size", (chunkSize: number) => {
-        console.log("[procedural-2d-gen] chunk-size", chunkSize);
         chunkSizeInput.value = chunkSize.toString();
     });
     plugin.emit("request-chunk-size");
