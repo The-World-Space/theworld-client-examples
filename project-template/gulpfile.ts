@@ -5,6 +5,7 @@ import rename from "gulp-rename";
 import webpack from "webpack";
 import webpackConfig from "./webpack.config";
 import webpackStream from "webpack-stream";
+import eslint from "gulp-eslint-new";
 const rollup = require("gulp-rollup");
 const webserver = require("gulp-webserver");
 
@@ -13,11 +14,31 @@ const pluginTsProject = ts.createProject("tsconfig.json", {
     declaration: false
 });
 
-gulp.task("plugin", (): NodeJS.ReadWriteStream => {
-    const stream = gulp.src("src/plugin/**/*.ts")
+gulp.task("plugin", (done): NodeJS.ReadWriteStream => {
+    return gulp.src("src/plugin/**/*.ts")
+        .pipe(eslint({
+            fix: true,
+            overrideConfig: {
+                "plugins": [
+                    "no-for-of-loops"
+                ],
+                "rules": {
+                    "no-console": "error",
+                    "no-debugger": "error",
+                    "no-alert": "error",
+                    "no-for-of-loops/no-for-of-loops": "error"
+                }
+            }
+        }))
+        .pipe(eslint.fix())
+        .pipe(eslint.format())
         .pipe(pluginTsProject()
             .on("error", (): void => {
-                stream.emit("end");
+                done();
+            }))
+        .pipe(eslint.failAfterError()
+            .on("error", (): void => {
+                done();
             }))
         .pipe(terser({ compress: true }))
         .pipe(rollup({
@@ -29,20 +50,19 @@ gulp.task("plugin", (): NodeJS.ReadWriteStream => {
         }))
         .pipe(rename("plugin.js"))
         .pipe(gulp.dest("src/iframe"));
-
-    return stream;
 });
 
 gulp.task("watch-plugin", gulp.series("plugin", function watch(): void {
     gulp.watch("src/plugin/**/*", gulp.series("plugin"));
 }));
 
-gulp.task("iframe", (): NodeJS.ReadWriteStream => {
-    const stream = gulp.src("src/iframe/index.ts")
-        .pipe(webpackStream(webpackConfig, webpack as any))
+gulp.task("iframe", (done): NodeJS.ReadWriteStream => {
+    return gulp.src("src/iframe/index.ts")
+        .pipe(webpackStream(webpackConfig, webpack as any)
+            .on("error", (): void => {
+                done();
+            }))
         .pipe(gulp.dest("dist/"));
-    
-    return stream;
 });
 
 gulp.task("watch-iframe", gulp.series("iframe", function watch(): void {
