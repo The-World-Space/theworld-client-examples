@@ -4,8 +4,8 @@ import { Vector2 } from "./math/Vector2";
 import { WorldGenerator } from "./procedural-gen/WorldGenerator";
 
 class Plugin extends BasePlugin {
-    private readonly _defaultChunkSize = 9;
-    private readonly _defaultPlayerViewDistance = 3;
+    private readonly _defaultChunkSize = 5;
+    private readonly _defaultPlayerViewDistance = 5;
 
     private _coroutineDispatcher: CoroutineDispatcher|null = null;
     private _worldGenerator: WorldGenerator|null = null;
@@ -64,7 +64,7 @@ class Plugin extends BasePlugin {
         try {
             if (event === "set-chunk-size") {
                 if (this._worldGenerator) {
-                    this._worldGenerator.chunkSize = Math.floor(args[0]);
+                    //this._worldGenerator.chunkSize = Math.floor(args[0]);
                     this.broadcastMessage("chunk-size", this._worldGenerator.chunkSize);
                 }
             } else if (event === "request-chunk-size") {
