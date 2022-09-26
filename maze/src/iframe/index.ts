@@ -65,7 +65,7 @@ async function main(): Promise<void> {
     const seedInputEventExecutor = new DebounceExecuter();
     seedInput.oninput = (): void => {
         seedInputEventExecutor.execute(() => {
-            plugin.emit("set-seed", parseInt(seedInput.value));
+            plugin.emit("seed-input", parseInt(seedInput.value));
         });
     };
     plugin.on("seed", (seed: number) => {

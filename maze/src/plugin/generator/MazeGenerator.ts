@@ -1,4 +1,3 @@
-import { Logger } from "../helper/Logger";
 import { Mulberry32 } from "../math/Mulberry32";
 import { Vector2 } from "../math/Vector2";
 import { Immutable } from "../types/Immutable";
@@ -20,6 +19,7 @@ class GridCell {
 export class MazeGenerator {
     private readonly _world: IWorld;
     private readonly _spawnedTiles: Immutable<Vector2>[] = [];
+    private readonly _spawnedColliders: Immutable<Vector2>[] = [];
 
     public constructor(world: IWorld) {
         this._world = world;
@@ -27,13 +27,6 @@ export class MazeGenerator {
 
     // Generate a maze using the randomized DFS algorithm.
     public generate(width: number, height: number, offset: Immutable<Vector2>, seed: number): void {
-        const spawnedTiles = this._spawnedTiles;
-        for (let i = 0; i < spawnedTiles.length; ++i) {
-            const tile = spawnedTiles[i];
-            this._world.deleteTile(tile.x, tile.y, false);
-        }
-        spawnedTiles.length = 0;
-
         const random = new Mulberry32(seed);
         const grid: GridCell[][] = [];
         for (let x = 0; x < width; ++x) {
@@ -64,11 +57,31 @@ export class MazeGenerator {
 
         for (let x = 0; x < blocks.length; ++x) {
             for (let y = 0; y < blocks[0].length; ++y) {
+                const block = blocks[x][y];
                 const xWorld = x + offset.x;
                 const yWorld = y + offset.y;
-                this._world.setTile(xWorld, yWorld, 40, blocks[x][y] ? 1 : 0, false);
+                this._world.setTile(xWorld, yWorld, 40, block ? 1 : 0, false);
                 this._spawnedTiles.push(new Vector2(xWorld, yWorld));
+                if (block) {
+                    this._world.setCollider(xWorld, yWorld, true);
+                    this._spawnedColliders.push(new Vector2(xWorld, yWorld));
+                }
             }
+        }
+    }
+
+    public clear(): void {
+        const spawnedTiles = this._spawnedTiles;
+        for (let i = 0; i < spawnedTiles.length; ++i) {
+            const tile = spawnedTiles[i];
+            this._world.deleteTile(tile.x, tile.y, false);
+        }
+        spawnedTiles.length = 0;
+
+        const spawnedColliders = this._spawnedColliders;
+        for (let i = 0; i < spawnedColliders.length; ++i) {
+            const collider = spawnedColliders[i];
+            this._world.setCollider(collider.x, collider.y, false);
         }
     }
 
