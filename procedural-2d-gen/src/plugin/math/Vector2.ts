@@ -3,6 +3,8 @@ import { ImmutConvertable } from "src/plugin/types/Immutable";
 interface ReadonlyVector2 {
     readonly x: number;
     readonly y: number;
+
+    clone(): Vector2;
 }
 
 export class Vector2 implements ImmutConvertable<ReadonlyVector2> {

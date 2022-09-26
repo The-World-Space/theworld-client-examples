@@ -28,6 +28,7 @@ export class WorldGenerator {
 
     private _loadCirclePoints: readonly Immutable<Vector2>[];
     private _unloadChunkQueueMaxValue: number;
+    private readonly _playerPositions = new Map<string, Vector2>();
     private readonly _playerChunkPositions = new Map<string, Vector2>();
     private readonly _userChunks = new Map<string, UserChunkData>();
     private readonly _loadedChunks = new Map<`${number}_${number}`, number>();
@@ -227,8 +228,8 @@ export class WorldGenerator {
 
             this._resetParameters = null;
             
-            this._playerChunkPositions.forEach((chunkIndex, playerId) => {
-                this.updatePlayerPosition(playerId, chunkIndex, true);
+            this._playerPositions.forEach((position, playerId) => {
+                this.updatePlayerPosition(playerId, position, true);
             });
         } else {
             const userChunkData = playerId !== undefined
@@ -322,6 +323,14 @@ export class WorldGenerator {
 
     public updatePlayerPosition(playerId: string, position: Immutable<Vector2>, forceUpdate = false): void {
         const chunkLoader = this._chunkLoader;
+
+        const savedPosition = this._playerPositions.get(playerId);
+        if (savedPosition !== undefined) {
+            savedPosition.copy(position);
+        } else {
+            this._playerPositions.set(playerId, position.clone());
+        }
+
         const playerChunkPosition = chunkLoader.getChunkIndexFromPosition(position, this._tempVector1);
         const playerOldChunkPosition = this._playerChunkPositions.get(playerId);
         if (!forceUpdate && playerOldChunkPosition?.equals(playerChunkPosition)) return;
@@ -336,8 +345,10 @@ export class WorldGenerator {
     }
 
     public removePlayer(playerId: string): void {
-        const playerPosition = this._playerChunkPositions.get(playerId);
-        if (playerPosition) {
+        this._playerPositions.delete(playerId);
+
+        const playerChunkPosition = this._playerChunkPositions.get(playerId);
+        if (playerChunkPosition) {
             this.lazyUpdateChunk(playerId, undefined);
             this._playerChunkPositions.delete(playerId);
         }

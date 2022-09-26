@@ -22,36 +22,43 @@ async function main(): Promise<void> {
 
     const chunkSizeInput = document.getElementById("chunk-size") as HTMLInputElement;
     const chunkSizeInputEventExecutor = new DebounceExecuter();
-    chunkSizeInput.addEventListener("input", event => {
+    chunkSizeInput.oninput = (event): void => {
         event.preventDefault();
         chunkSizeInputEventExecutor.execute(() => {
             plugin.emit("set-chunk-size", parseInt(chunkSizeInput.value));
         });
-    });
-    plugin.on("set-chunk-size", (chunkSize: number) => {
+    };
+    plugin.on("chunk-size", (chunkSize: number) => {
+        console.log("[procedural-2d-gen] chunk-size", chunkSize);
         chunkSizeInput.value = chunkSize.toString();
     });
+    plugin.emit("request-chunk-size");
     
     const viewDistanceInput = document.getElementById("view-distance") as HTMLInputElement;
     const viewDistanceInputEventExecutor = new DebounceExecuter();
-    viewDistanceInput.addEventListener("input", event => {
+    viewDistanceInput.oninput = (event): void => {
         event.preventDefault();
         viewDistanceInputEventExecutor.execute(() => {
             plugin.emit("set-player-view-distance", parseInt(viewDistanceInput.value));
         });
-    });
-    plugin.on("set-player-view-distance", (viewDistance: number) => {
+    };
+    plugin.on("player-view-distance", (viewDistance: number) => {
         viewDistanceInput.value = viewDistance.toString();
     });
+    plugin.emit("request-player-view-distance");
 
     const seedInput = document.getElementById("seed") as HTMLInputElement;
     const seedInputEventExecutor = new DebounceExecuter();
-    seedInput.addEventListener("input", event => {
+    seedInput.oninput = (event): void => {
         event.preventDefault();
         seedInputEventExecutor.execute(() => {
             plugin.emit("set-seed", seedInput.value);
         });
+    };
+    plugin.on("seed", (seed: string) => {
+        seedInput.value = seed;
     });
+    plugin.emit("request-seed");
 }
 
 main();
