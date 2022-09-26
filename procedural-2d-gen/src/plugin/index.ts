@@ -4,8 +4,8 @@ import { Vector2 } from "./math/Vector2";
 import { WorldGenerator } from "./procedural-gen/WorldGenerator";
 
 class Plugin extends BasePlugin {
-    private readonly _chunkSize = 15;
-    private readonly _playerViewDistance = 3;
+    private readonly _defaultChunkSize = 9;
+    private readonly _defaultPlayerViewDistance = 3;
 
     private _coroutineDispatcher: CoroutineDispatcher|null = null;
     private _worldGenerator: WorldGenerator|null = null;
@@ -17,9 +17,9 @@ class Plugin extends BasePlugin {
         Logger.init(this);
         try {
             const dispatcher = this._coroutineDispatcher = new CoroutineDispatcher();
-            this._worldGenerator = new WorldGenerator(dispatcher, this, this._chunkSize, this._playerViewDistance);
-        } catch(e) {
-            Logger.error(e);
+            this._worldGenerator = new WorldGenerator(dispatcher, this, this._defaultChunkSize, this._defaultPlayerViewDistance);
+        } catch(e: any) {
+            Logger.error(`${e.message}\n${e.stack}`);
         }
     }
 
@@ -29,8 +29,8 @@ class Plugin extends BasePlugin {
             this._coroutineDispatcher = null;
             this._worldGenerator!.dispose();
             this._worldGenerator = null;
-        } catch(e) {
-            Logger.error(e);
+        } catch(e: any) {
+            Logger.error(`${e.message}\n${e.stack}`);
         }
     }
 
@@ -38,8 +38,8 @@ class Plugin extends BasePlugin {
         try {
             this._players.add(userId);
             this._worldGenerator?.updatePlayerPosition(userId, this._tempVector.set(0, 0));
-        } catch(e) {
-            Logger.error(e);
+        } catch(e: any) {
+            Logger.error(`${e.message}\n${e.stack}`);
         }
     }
 
@@ -47,16 +47,36 @@ class Plugin extends BasePlugin {
         try {
             this._players.delete(userId);
             this._worldGenerator?.removePlayer(userId);
-        } catch(e) {
-            Logger.error(e);
+        } catch (e: any) {
+            Logger.error(`${e.message}\n${e.stack}`);
         }
     }
     
     public override onPlayerMove(playerId: string, x: number, y: number): void {
         try {
             this._worldGenerator?.updatePlayerPosition(playerId, this._tempVector.set(x, y));
-        } catch(e) {
-            Logger.error(e);
+        } catch (e: any) {
+            Logger.error(`${e.message}\n${e.stack}`);
+        }
+    }
+
+    public override onMessage(_userId: string, event: string, ...args: any[]): void {
+        try {
+            if (event === "set-chunk-size") {
+                if (this._worldGenerator) {
+                    this._worldGenerator.chunkSize = Math.floor(args[0]);
+                }
+            } else if (event === "set-player-view-distance") {
+                if (this._worldGenerator) {
+                    this._worldGenerator.playerViewDistance = Math.floor(args[0]);
+                }
+            } else if (event === "set-seed") {
+                if (this._worldGenerator) {
+                    this._worldGenerator.seed = args[0];
+                }
+            }
+        } catch (e: any) {
+            Logger.error(`${e.message}\n${e.stack}`);
         }
     }
 }

@@ -7,7 +7,7 @@ import { Time } from "./Time";
 export class CoroutineDispatcher {
     private readonly _time: Time;
     private readonly _coroutineProcessor: CoroutineProcessor;
-    private _setIntervalId: ReturnType<typeof setInterval>|null;
+    private _setTimeoutlId: ReturnType<typeof setTimeout>|null = null;
 
     public constructor(updateInterval = 10) {
         const time = this._time = new Time();
@@ -15,13 +15,19 @@ export class CoroutineDispatcher {
 
         time.start();
 
-        this._setIntervalId = setInterval(() => {
+        const requestFrame = (): void => {
+            this._setTimeoutlId = setTimeout(() => {
+                requestFrame();
+            }, updateInterval);
+
             try {
                 this.update();
-            } catch(e) {
-                Logger.error(e);
+            } catch (e: any) {
+                Logger.error(`${e.message}\n${e.stack}`);
             }
-        }, updateInterval);
+        };
+
+        requestFrame();
     }
 
     private readonly update = (): void => {
@@ -37,10 +43,14 @@ export class CoroutineDispatcher {
         return coroutine;
     }
 
+    public stopCoroutine(coroutine: Coroutine): void {
+        this._coroutineProcessor.removeCoroutine(coroutine);
+    }
+
     public dispose(): void {
-        if (this._setIntervalId !== null) {
-            clearInterval(this._setIntervalId);
-            this._setIntervalId = null;
+        if (this._setTimeoutlId !== null) {
+            clearTimeout(this._setTimeoutlId);
+            this._setTimeoutlId = null;
         }
     }
 }

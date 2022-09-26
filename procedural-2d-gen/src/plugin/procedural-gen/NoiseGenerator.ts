@@ -3,7 +3,7 @@ import { Immutable } from "src/plugin/types/Immutable";
 import { Vector2 } from "../math/Vector2";
 
 export class Wave {
-    public readonly seed: number;
+    public seed: number;
     public readonly frequency: number;
     public readonly amplitude: number;
 
