@@ -60,7 +60,7 @@ class Plugin extends BasePlugin {
         }
     }
 
-    public override onMessage(_userId: string, event: string, ...args: any[]): void {
+    public override onMessage(userId: string, event: string, ...args: any[]): void {
         try {
             if (event === "set-chunk-size") {
                 if (this._worldGenerator) {
@@ -69,7 +69,7 @@ class Plugin extends BasePlugin {
                 }
             } else if (event === "request-chunk-size") {
                 if (this._worldGenerator) {
-                    this.broadcastMessage("chunk-size", this._worldGenerator.chunkSize);
+                    this.sendMessage(userId, "chunk-size", this._worldGenerator.chunkSize);
                 }
             }
             
@@ -80,7 +80,7 @@ class Plugin extends BasePlugin {
                 }
             } else if (event === "request-player-view-distance") {
                 if (this._worldGenerator) {
-                    this.broadcastMessage("player-view-distance", this._worldGenerator.playerViewDistance);
+                    this.sendMessage(userId, "player-view-distance", this._worldGenerator.playerViewDistance);
                 }
             }
             
@@ -91,7 +91,7 @@ class Plugin extends BasePlugin {
                 }
             } else if (event === "request-seed") {
                 if (this._worldGenerator) {
-                    this.broadcastMessage("seed", this._worldGenerator.seed);
+                    this.sendMessage(userId, "seed", this._worldGenerator.seed);
                 }
             }
         } catch (e: any) {

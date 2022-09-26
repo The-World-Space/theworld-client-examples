@@ -21,6 +21,18 @@ class Plugin extends BasePlugin {
             Logger.error(`${e.message}\n${e.stack}`);
         }
     }
+
+    public override onPlayerMove(userId: string, x: number, y: number): void {
+        Logger.log(`onPlayerMove: ${userId}, ${x}, ${y}`);
+    }
+
+    public override onMessage(userId: string, event: string, ...messages: any): void {
+        try {
+            Logger.log(`onMessage: ${userId}, ${event}, ${messages}`);
+        } catch (e: any) {
+            Logger.error(`${e.message}\n${e.stack}`);
+        }
+    }
 }
 
 globalThis.PluginImpl = Plugin;

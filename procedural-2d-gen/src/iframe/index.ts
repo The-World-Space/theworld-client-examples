@@ -22,8 +22,7 @@ async function main(): Promise<void> {
 
     const chunkSizeInput = document.getElementById("chunk-size") as HTMLInputElement;
     const chunkSizeInputEventExecutor = new DebounceExecuter();
-    chunkSizeInput.oninput = (event): void => {
-        event.preventDefault();
+    chunkSizeInput.oninput = (): void => {
         chunkSizeInputEventExecutor.execute(() => {
             plugin.emit("set-chunk-size", parseInt(chunkSizeInput.value));
         });
@@ -35,8 +34,7 @@ async function main(): Promise<void> {
     
     const viewDistanceInput = document.getElementById("view-distance") as HTMLInputElement;
     const viewDistanceInputEventExecutor = new DebounceExecuter();
-    viewDistanceInput.oninput = (event): void => {
-        event.preventDefault();
+    viewDistanceInput.oninput = (): void => {
         viewDistanceInputEventExecutor.execute(() => {
             plugin.emit("set-player-view-distance", parseInt(viewDistanceInput.value));
         });
@@ -48,8 +46,7 @@ async function main(): Promise<void> {
 
     const seedInput = document.getElementById("seed") as HTMLInputElement;
     const seedInputEventExecutor = new DebounceExecuter();
-    seedInput.oninput = (event): void => {
-        event.preventDefault();
+    seedInput.oninput = (): void => {
         seedInputEventExecutor.execute(() => {
             plugin.emit("set-seed", parseInt(seedInput.value));
         });
