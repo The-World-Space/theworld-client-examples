@@ -27,7 +27,6 @@ async function main(): Promise<void> {
     const positionInputEventExecutor = new DebounceExecuter();
     const positionEvent = (): void => {
         positionInputEventExecutor.execute(() => {
-            console.log("position changed");
             plugin.emit("position-input", {
                 x: parseInt(positionXInput.value),
                 y: parseInt(positionYInput.value)
