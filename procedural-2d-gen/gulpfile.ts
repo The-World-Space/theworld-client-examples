@@ -19,10 +19,7 @@ gulp.task("plugin", (): NodeJS.ReadWriteStream => {
             .on("error", (): void => {
                 stream.emit("end");
             }))
-        .pipe(terser({ compress: true })
-            .on("error", (): void => {
-                stream.emit("end");
-            }))
+        .pipe(terser({ compress: true }))
         .pipe(rollup({
             input: "./src/plugin/index.js",
             output: {
@@ -42,10 +39,7 @@ gulp.task("watch-plugin", gulp.series("plugin", function watch(): void {
 
 gulp.task("iframe", (): NodeJS.ReadWriteStream => {
     const stream = gulp.src("src/iframe/index.ts")
-        .pipe(webpackStream(webpackConfig, webpack as any)
-            .on("error", (): void => {
-                stream.emit("end");
-            }))
+        .pipe(webpackStream(webpackConfig, webpack as any))
         .pipe(gulp.dest("dist/"));
     
     return stream;
