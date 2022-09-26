@@ -1,7 +1,6 @@
 import { Coroutine } from "../coroutine/Coroutine";
 import { CoroutineDispatcher } from "../coroutine/CoroutineDispatcher";
 import { CoroutineIterator } from "../coroutine/CoroutineIterator";
-import { Logger } from "../helper/Logger";
 import { Vector2 } from "../math/Vector2";
 import { Immutable } from "../types/Immutable";
 import { IWorld } from "./IWorld";
