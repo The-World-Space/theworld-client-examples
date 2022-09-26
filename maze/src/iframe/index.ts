@@ -10,11 +10,9 @@ const pluginName = "maze-generator";
 async function main(): Promise<void> {
     const client = new Client();
     client.addPluginPort("plugin", $INLINE_FILE("./plugin.js"), "");
-    console.log("Connecting...");
     await client.connect();
 
     const plugin = await client.getPlugin("plugin");
-    console.log("plugin loaded");
     
     plugin.on("log", (message: any) => {
         console.log(`[${pluginName}]`, message);
