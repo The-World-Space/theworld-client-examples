@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>procedural-2d-gen</title>
+    <link rel="icon" href="data:,">
+</head>
+
+<body>
+    <div id="gui-container">
+        <div id="title">maze-gen</div>
+
+        <span>position</span>
+        <div class="vector2-input-container">
+            <div class="labeled-input">
+                x:&nbsp;
+                <input class="vector2-input" id="position-x" type="number" value="0" min="-100" max="100" step="1">
+            </div>
+            <div class="input-padding"></div>
+            <div class="labeled-input">
+                y:&nbsp;
+                <input class="vector2-input" id="position-y" type="number" value="0" min="-100" max="100" step="1">
+            </div>
+        </div>
+
+        <span>size</span>
+        <div class="vector2-input-container">
+            <div class="labeled-input">
+                x:&nbsp;
+                <input class="vector2-input" id="size-x" type="number" value="0" min="1" max="50" step="1">
+            </div>
+            <div class="input-padding"></div>
+            <div class="labeled-input">
+                y:&nbsp;
+                <input class="vector2-input" id="size-y" type="number" value="0" min="1" max="50" step="1">
+            </div>
+        </div>
+
+        <span>seed</span>
+        <input id="seed" type="number" value="0">
+    </div>
+</body>
+
+</html>
