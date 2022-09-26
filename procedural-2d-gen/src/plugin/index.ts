@@ -64,7 +64,7 @@ class Plugin extends BasePlugin {
         try {
             if (event === "set-chunk-size") {
                 if (this._worldGenerator) {
-                    //this._worldGenerator.chunkSize = Math.floor(args[0]);
+                    this._worldGenerator.chunkSize = Math.floor(args[0]);
                     this.broadcastMessage("chunk-size", this._worldGenerator.chunkSize);
                 }
             } else if (event === "request-chunk-size") {
