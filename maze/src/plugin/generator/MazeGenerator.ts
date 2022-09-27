@@ -83,6 +83,7 @@ export class MazeGenerator {
             const collider = spawnedColliders[i];
             this._world.setCollider(collider.x, collider.y, false);
         }
+        spawnedColliders.length = 0;
     }
 
     private getNeighbors(grid: GridCell[][], cell: GridCell): GridCell[] {
@@ -136,10 +137,10 @@ export class MazeGenerator {
         const blocks: boolean[][] = new Array(width * 2 + 1).fill(null).map(_ => new Array(height * 2 + 1));
 
         for (let x = 0; x < width * 2 + 1; ++x) {
-            blocks[0][x] = true;
+            blocks[x][0] = true;
         }
         for (let y = 0; y < height * 2 + 1; ++y) {
-            blocks[y][0] = true;
+            blocks[0][y] = true;
         }
         for (let x = 0; x < width; x++) {
             for (let y = 0; y < height; y++) {
@@ -150,10 +151,10 @@ export class MazeGenerator {
             }
         }
         for (let x = 0; x < width * 2 + 1; ++x) {
-            blocks[height * 2][x] = true;
+            blocks[x][height * 2] = true;
         }
         for (let y = 0; y < height * 2 + 1; ++y) {
-            blocks[y][width * 2] = true;
+            blocks[width * 2][y] = true;
         }
         return blocks;
     }
