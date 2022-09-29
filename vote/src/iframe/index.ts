@@ -67,8 +67,6 @@ async function main(): Promise<void> {
         am_i_voted = _am_i_voted;
         am_i_admin = _am_i_admin;
         broadCastReceiver(voting, _, data);
-
-        console.log(voting, _, data, _am_i_voted, _am_i_admin);
     });
 
     const reset = document.getElementById("reset")!;
