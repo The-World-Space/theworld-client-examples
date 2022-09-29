@@ -99,7 +99,7 @@ class Plugin extends BasePlugin {
         if (/정답:(O|X)/gi.test(message)) {
             this.playing = false;
             const a = message.slice(3);
-            this.answer = (a[0].toLowerCase()==="O") ? OX.O : OX.X;
+            this.answer = (a[0].toLowerCase()==="o") ? OX.O : OX.X;
             this._judge();
             this._broadcastPrivateInfomation();
             return;
