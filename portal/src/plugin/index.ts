@@ -90,6 +90,7 @@ class Plugin extends BasePlugin<Data> {
 
                 this._target = [x, y];
                 this.saveData({ target: [x, y] });
+                this._setupId = null;
 
                 this.sendMessage(userId, "setuped");
             }
