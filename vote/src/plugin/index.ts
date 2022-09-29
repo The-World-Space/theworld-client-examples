@@ -48,30 +48,41 @@ class Plugin extends BasePlugin {
         this.data = this._candidates.map((e, i) => [e, this._vote_count.get(i + 1) || 0]);
     }
 
-    public override onPlayerJoin(userId: string): void {
-        this._sendState(userId);
-    }
-
     public override onMessage(userId: string, event: string, ...messages: any): void {
         try {
             switch (event) {
                 case "start": {
+                    if(!this.isAdmin(userId)) return;
                     this._voting = true;
 
                     break;
                 }
                 case "stop": {
+                    if(!this.isAdmin(userId)) return;
                     this._voting = false;
 
                     break;
                 }
                 case "reset": {
+                    if(!this.isAdmin(userId)) return;
+
+                    const oldVotedPlayers: string[] = [];
+                    this._voted_players.forEach(value => oldVotedPlayers.push(value));
+
                     this._vote_count.clear();
                     this._voted_players.clear();
                     this._candidates = [];
                     this._voting = false;
 
                     this._updateData();
+                    for(let i = 0; i < oldVotedPlayers.length; i++) {
+                        const userId = oldVotedPlayers[i];
+                        try {
+                            this._sendState(userId);
+                        } catch(e) {
+                            Logger.error(e);
+                        }
+                    }
                     break;
                 }
                 case "vote": {
@@ -88,6 +99,7 @@ class Plugin extends BasePlugin {
                     break;
                 }
                 case "add_cand": {
+                    if(!this.isAdmin(userId)) return;
                     const cand: string = messages[0];
 
                     this._candidates.push(cand);
@@ -95,11 +107,15 @@ class Plugin extends BasePlugin {
                     this._updateData();
                     break;
                 }
+                case "get_state": {
+                    this._sendState(userId);
+                    break;
+                }
                 default:
                     Logger.error("unknown event " + event);
             }
-            this._broadCastState();
             this._sendState(userId);
+            this._broadCastState();
         } catch (e: any) {
             Logger.error(`${e.message}\n${e.stack}`);
         }
