@@ -1,0 +1,56 @@
+html, body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+.movingWalkwayBackgroundUp {
+    background: linear-gradient(0deg, rgb(0, 0, 0) 50%, #0000 0);
+    background-repeat: repeat-y;
+    animation: MovingWalkwayBackgroundUp 0.064s infinite linear;
+    background-size: 100% 32px;
+}
+.movingWalkwayBackgroundRight {
+    background: linear-gradient(90deg, rgb(0, 0, 0) 50%, #0000 0);
+    background-repeat: repeat-x;
+    animation: MovingWalkwayBackgroundRight 0.064s infinite linear;
+    background-size: 32px 100%;
+}
+.movingWalkwayBackgroundDown {
+    background: linear-gradient(180deg, rgb(0, 0, 0) 50%, #0000 0);
+    background-repeat: repeat-y;
+    animation: MovingWalkwayBackgroundDown 0.064s infinite linear;
+    background-size: 100% 32px;
+}
+.movingWalkwayBackgroundLeft {
+    background: linear-gradient(-90deg, rgb(0, 0, 0) 50%, #0000 0);
+    background-repeat: repeat-x;
+    animation: MovingWalkwayBackgroundLeft 0.064s infinite linear;
+    background-size: 32px 100%;
+}
+
+@keyframes MovingWalkwayBackgroundUp {
+    100% {
+      background-position-y: -32px;
+    }
+}
+@keyframes MovingWalkwayBackgroundRight {
+    100% {
+      background-position-x: 32px;
+    }
+}
+@keyframes MovingWalkwayBackgroundDown {
+    100% {
+      background-position-y: 32px;
+    }
+}
+@keyframes MovingWalkwayBackgroundLeft {
+    100% {
+      background-position-x: -32px;
+    }
+}
+
+#setup > button {
+    border: 0;
+}
