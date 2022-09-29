@@ -61,13 +61,12 @@ async function main(): Promise<void> {
         controlPanel.style.display = am_i_admin ? "block" : "none";
     }
 
+    plugin.emit("get_state");
     plugin.on("state", broadCastReceiver);
     plugin.on("pstate", (voting: any, _: any, data: any, _am_i_voted: boolean, _am_i_admin: boolean) => {
         am_i_voted = _am_i_voted;
         am_i_admin = _am_i_admin;
         broadCastReceiver(voting, _, data);
-
-        console.debug(voting, _, data, _am_i_voted, _am_i_admin);
     });
 
     const reset = document.getElementById("reset")!;

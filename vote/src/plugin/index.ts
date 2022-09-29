@@ -1,7 +1,14 @@
 import { CoroutineDispatcher } from "./coroutine/CoroutineDispatcher";
 import { Logger } from "./helper/Logger";
 
-class Plugin extends BasePlugin {
+type Data = {
+    votedPlayers: string[];
+    voteCount: { [K: number]: number };
+    voting: boolean;
+    candidates: string[];
+}
+
+class Plugin extends BasePlugin<Data> {
     private _coroutineDispatcher: CoroutineDispatcher | null = null;
 
     private readonly _voted_players = new Set<string>();
@@ -11,14 +18,49 @@ class Plugin extends BasePlugin {
 
     public data: [string, number][] = [];
 
-    public override onLoad(): void {
+    public override onLoad(data: Data): void {
         Logger.init(this);
+        
+        if(!data) {
+            this.saveData({
+                votedPlayers: [],
+                voteCount: {},
+                voting: false,
+                candidates: []
+            });
+        } else {
+            data.votedPlayers.forEach(playerId => this._voted_players.add(playerId));
+            Object.keys(data.voteCount).forEach(candidateIndex => {
+                this._vote_count.set(candidateIndex as unknown as number, data.voteCount[candidateIndex as unknown as number])
+            });
+            this._voting = data.voting;
+            this._candidates = data.candidates;
+        }
+
+        this._updateData();
+    }
+
+    private _saveData() {
+        const votedPlayers: string[] = [];
+        const voteCount: { [K: number]: number } = {};
+
+        this._voted_players.forEach(userId => votedPlayers.push(userId));
+        this._vote_count.forEach((count, candidateIndex) => voteCount[candidateIndex] = count);
+
+        this.saveData({
+            votedPlayers,
+            voteCount,
+            voting: this._voting,
+            candidates: this._candidates
+        });
     }
 
     public override onUnload(): void {
         try {
             this._coroutineDispatcher!.dispose();
             this._coroutineDispatcher = null;
+
+            this._saveData();
         } catch (e: any) {
             Logger.error(`${e.message}\n${e.stack}`);
         }
@@ -48,30 +90,41 @@ class Plugin extends BasePlugin {
         this.data = this._candidates.map((e, i) => [e, this._vote_count.get(i + 1) || 0]);
     }
 
-    public override onPlayerJoin(userId: string): void {
-        this._sendState(userId);
-    }
-
     public override onMessage(userId: string, event: string, ...messages: any): void {
         try {
             switch (event) {
                 case "start": {
+                    if(!this.isAdmin(userId)) return;
                     this._voting = true;
 
                     break;
                 }
                 case "stop": {
+                    if(!this.isAdmin(userId)) return;
                     this._voting = false;
 
                     break;
                 }
                 case "reset": {
+                    if(!this.isAdmin(userId)) return;
+
+                    const oldVotedPlayers: string[] = [];
+                    this._voted_players.forEach(value => oldVotedPlayers.push(value));
+
                     this._vote_count.clear();
                     this._voted_players.clear();
                     this._candidates = [];
                     this._voting = false;
 
                     this._updateData();
+                    for(let i = 0; i < oldVotedPlayers.length; i++) {
+                        const userId = oldVotedPlayers[i];
+                        try {
+                            this._sendState(userId);
+                        } catch(e) {
+                            Logger.error(e);
+                        }
+                    }
                     break;
                 }
                 case "vote": {
@@ -88,6 +141,7 @@ class Plugin extends BasePlugin {
                     break;
                 }
                 case "add_cand": {
+                    if(!this.isAdmin(userId)) return;
                     const cand: string = messages[0];
 
                     this._candidates.push(cand);
@@ -95,16 +149,20 @@ class Plugin extends BasePlugin {
                     this._updateData();
                     break;
                 }
+                case "get_state": {
+                    this._sendState(userId);
+                    break;
+                }
                 default:
                     Logger.error("unknown event " + event);
             }
-            this._broadCastState();
             this._sendState(userId);
+            this._broadCastState();
+            this._saveData();
         } catch (e: any) {
             Logger.error(`${e.message}\n${e.stack}`);
         }
     }
-
 }
 
 globalThis.PluginImpl = Plugin;
