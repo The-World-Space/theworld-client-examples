@@ -1,3 +1,5 @@
+import { PluginEnvironmentInfo } from "theworld-client/types/plugin/declarations";
+
 import { CoroutineDispatcher } from "./coroutine/CoroutineDispatcher";
 import { LazyWorld } from "./generator/LazyWorld";
 import { MazeGenerator } from "./generator/MazeGenerator";
@@ -10,14 +12,19 @@ class Plugin extends BasePlugin {
     private _lazyWorld: LazyWorld|null = null;
     private _mazeGenerator: MazeGenerator|null = null;
 
+    private readonly _iframePosition = new Vector2(0, 0);
     private readonly _mazePosition = new Vector2(0, 0);
     private readonly _mazeSize = new Vector2(10, 10);
     private _seed = 0;
     private readonly _generateExecuter = new DebounceExecuter(500);
 
-    public override onLoad(): void {
+    public override onLoad(_data: any, info: PluginEnvironmentInfo): void {
         Logger.init(this);
         try {
+            if (info.isLocal) {
+                this._iframePosition.set(info.iframe.x, info.iframe.y);
+            }
+
             this._coroutineDispatcher = new CoroutineDispatcher();
             this._lazyWorld = new LazyWorld(this._coroutineDispatcher, this);
             this._mazeGenerator = new MazeGenerator(this._lazyWorld);
@@ -71,10 +78,19 @@ class Plugin extends BasePlugin {
         }
     }
 
+    private readonly _tempVector = new Vector2();
+
     private clearAndGenerate(): void {
         this._generateExecuter.execute(() => {
             this._mazeGenerator?.clear();
-            this._mazeGenerator?.generate(this._mazeSize.x, this._mazeSize.y, this._mazePosition, this._seed);
+            this._mazeGenerator?.generate(
+                this._mazeSize.x,
+                this._mazeSize.y,
+                this._tempVector
+                    .copy(this._mazePosition)
+                    .add(this._iframePosition),
+                this._seed
+            );
         });
     }
 }

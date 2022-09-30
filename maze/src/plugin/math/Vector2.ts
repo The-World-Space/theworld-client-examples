@@ -48,4 +48,11 @@ export class Vector2 implements ImmutConvertable<ReadonlyVector2> {
     public lengthSquared(): number {
         return this.x * this.x + this.y * this.y;
     }
+
+    public add(other: ReadonlyVector2): Vector2 {
+        this.x += other.x;
+        this.y += other.y;
+
+        return this;
+    }
 }
