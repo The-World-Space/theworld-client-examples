@@ -1,0 +1,8 @@
+(function () {
+	'use strict';
+
+	var Logger=function(){function n(){}return n.init=function(o){n._plugin=o;},n.log=function(o){n._plugin.broadcastMessage("log",o);},n.error=function(o){n._plugin.broadcastMessage("error",o);},n}();
+
+	var __extends=this&&this.__extends||function(){var t=function(o,n){return t=Object.setPrototypeOf||{__proto__:[]}instanceof Array&&function(t,o){t.__proto__=o;}||function(t,o){for(var n in o)Object.prototype.hasOwnProperty.call(o,n)&&(t[n]=o[n]);},t(o,n)};return function(o,n){if("function"!=typeof n&&null!==n)throw new TypeError("Class extends value "+String(n)+" is not a constructor or null");function r(){this.constructor=o;}t(o,n),o.prototype=null===n?Object.create(n):(r.prototype=n.prototype,new r);}}();var Plugin=function(t){function o(){var o=null!==t&&t.apply(this,arguments)||this;return o._iframeInfo=null,o}return __extends(o,t),o.prototype.onLoad=function(t,o){Logger.init(this);try{if(!o.isLocal)throw new Error("This plugin works for only local");this._iframeInfo=o.iframe;}catch(t){Logger.error("".concat(t.message,"\n").concat(t.stack));}},o.prototype.onPlayerMove=function(t,o,n){var r=this;null!==this._iframeInfo&&this._iframeInfo.x<=o&&o<this._iframeInfo.x+this._iframeInfo.width&&this._iframeInfo.y<=n&&n<this._iframeInfo.y+this._iframeInfo.height&&setTimeout(function(t,o){return function(){r.broadcastMessage("step",t,o);}}(o-this._iframeInfo.x,n-this._iframeInfo.y),70);},o.prototype.onUnload=function(){try{this._iframeInfo=null;}catch(t){Logger.error("".concat(t.message,"\n").concat(t.stack));}},o}(BasePlugin);globalThis.PluginImpl=Plugin;
+
+}());

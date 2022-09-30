@@ -48,6 +48,6 @@
         "webpack-stream": "^7.0.0"
     },
     "dependencies": {
-        "theworld-client": "^1.1.8"
+        "theworld-client": "^1.1.7"
     }
 }
