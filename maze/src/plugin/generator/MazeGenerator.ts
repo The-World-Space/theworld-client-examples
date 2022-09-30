@@ -156,6 +156,10 @@ export class MazeGenerator {
         for (let y = 0; y < height * 2 + 1; ++y) {
             blocks[width * 2][y] = true;
         }
+
+        blocks[1][0] = false;
+        blocks[width * 2 - 1][height * 2] = false;
+
         return blocks;
     }
 }
