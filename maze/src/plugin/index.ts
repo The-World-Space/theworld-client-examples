@@ -13,9 +13,9 @@ class Plugin extends BasePlugin {
     private _mazeGenerator: MazeGenerator|null = null;
 
     private readonly _iframePosition = new Vector2(0, 0);
-    private readonly _mazePosition = new Vector2(0, 0);
-    private readonly _mazeSize = new Vector2(10, 10);
+    private readonly _mazeSize = new Vector2(7, 7);
     private _seed = 0;
+    private readonly _maxSize = 7;
     private readonly _generateExecuter = new DebounceExecuter(500);
 
     public override onLoad(_data: any, info: PluginEnvironmentInfo): void {
@@ -52,25 +52,21 @@ class Plugin extends BasePlugin {
 
     public override onMessage(userId: string, event: string, ...messages: any): void {
         try {
-            if (event === "request-position") {
-                this.sendMessage(userId, "position", this._mazePosition);
-            } else if (event === "request-size") {
+            if (event === "request-size") {
                 this.sendMessage(userId, "size", this._mazeSize);
             } else if (event === "request-seed") {
                 this.sendMessage(userId, "seed", this._seed);
             }
 
-            if (event === "position-input") {
+            if (event === "size-input") {
                 const { x, y } = messages[0];
-                this._mazePosition.set(x, y);
-                this.clearAndGenerate();
-            } else if (event === "size-input") {
-                const { x, y } = messages[0];
-                this._mazeSize.set(x, y);
+                this._mazeSize.set(Math.min(x, this._maxSize), Math.min(y, this._maxSize));
+                this.broadcastMessage("size", { x: this._mazeSize.x, y: this._mazeSize.y });
                 this.clearAndGenerate();
             } else if (event === "seed-input") {
                 const seed = messages[0];
                 this._seed = seed;
+                this.broadcastMessage("seed", this._seed);
                 this.clearAndGenerate();
             }
         } catch (e: any) {
@@ -86,9 +82,7 @@ class Plugin extends BasePlugin {
             this._mazeGenerator?.generate(
                 this._mazeSize.x,
                 this._mazeSize.y,
-                this._tempVector
-                    .copy(this._mazePosition)
-                    .add(this._iframePosition),
+                this._tempVector.copy(this._iframePosition),
                 this._seed
             );
         });

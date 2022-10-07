@@ -22,25 +22,6 @@ async function main(): Promise<void> {
         console.error(`[${pluginName}]`, error);
     });
 
-    const positionXInput = document.getElementById("position-x") as HTMLInputElement;
-    const positionYInput = document.getElementById("position-y") as HTMLInputElement;
-    const positionInputEventExecutor = new DebounceExecuter();
-    const positionEvent = (): void => {
-        positionInputEventExecutor.execute(() => {
-            plugin.emit("position-input", {
-                x: parseInt(positionXInput.value),
-                y: parseInt(positionYInput.value)
-            });
-        });
-    };
-    positionXInput.oninput = positionEvent;
-    positionYInput.oninput = positionEvent;
-    plugin.on("position", (position: { x: number, y: number }) => {
-        positionXInput.value = position.x.toString();
-        positionYInput.value = position.y.toString();
-    });
-    plugin.emit("request-position");
-
     const sizeXInput = document.getElementById("size-x") as HTMLInputElement;
     const sizeYInput = document.getElementById("size-y") as HTMLInputElement;
     const sizeInputEventExecutor = new DebounceExecuter();
